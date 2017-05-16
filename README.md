@@ -9,7 +9,7 @@ chat application server as a Docker image.
 Since version 3.8 Mattermost supports setting configuration values via
 environment variables. As this perfectly matches with common container
 practices and allows to remove the logic to write a configuration file from
-environment variables during startup, the former environment variable and their
+environment variables during startup, the former environment variables and their
 resolution have been removed. This increases maintainability of this image and
 keeps it tighter to Mattermost itself.
 
@@ -36,7 +36,7 @@ You can generate the random strings for salts &ndash; though this isn't needed f
 With the provided example configuration, open http://localhost:8080 in a
 browser and create your administrator account.
 
-You should now have the Mattermost application up and ready for testing. If you want to use this image in production the please read on.
+You should now have the Mattermost application up and ready for testing. If you want to use this image in production, please read on.
 
 
 # Configuration
@@ -48,9 +48,10 @@ which you may replace by mounting your customized one into
 `/opt/mattermost/mattermost/config`.
 
 It is however recommended to override setting with environment variables.
-For the defaults see the config file linked above. Please refer to
+Please refer to
 [this documentation](https://docs.mattermost.com/administration/config-settings.html)
 regarding naming of environment variables and available configuration options.
+For the defaults see the config file linked above.
 
 **MAKE SURE THAT ANY OF YOUR DEPLOYMENTS IS CONFIGURED WITH UNIQUE VALUES PER
 INSTANCE FOR EACH OF THESE SETTINGS:**
@@ -70,19 +71,19 @@ Mattermost's debug level to `DEBUG`.
 
 Mattermost stores data in the file system for assets like file uploads and avatars.
 The image defines a [volume](https://docs.docker.com/engine/tutorials/dockervolumes/)
-for that location.
+for that location at `/opt/mattermost/data`.
 
 ## Database
 
 Mattermost uses a database backend to store most of its data.
-You can configure this image to use MySQL or Postgres.
+You can configure this image to use MariaDB/MySQL or Postgres.
 
 ### Autodiscovery
 
 The simplest configuration uses a container dedicated as database backend, like
 in the example `docker-compose.yml`.
 As the service names (`postgres` or `mysql`) will be used as hostnames, these
-will be probed and any configuration values will be derived from it and use
+will be probed and any configuration values will be derived from it, using
 default values. Just make sure that `DB_PASS` in the `mattermost` service and
 `POSTGRES_PASSWORD` resp. `MYSQL_ROOT_PASSWORD` in the database service are
 identical.

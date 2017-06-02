@@ -15,4 +15,4 @@ build: pull-base
 release: build
 	git tag -f $(VERSION)
 	git tag -f latest
-	git push -f upstream $(VERSION) latest
+	git push -f upstream master $(VERSION) latest

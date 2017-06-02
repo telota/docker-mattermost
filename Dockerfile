@@ -1,6 +1,6 @@
-FROM alpine:3.5
+FROM alpine:3.6
 
-ENV MATTERMOST_VERSION=3.8.2 \
+ENV MATTERMOST_VERSION=3.9.0 \
     MATTERMOST_DATA_DIR="/opt/mattermost/data" \
     MATTERMOST_CONF_DIR="/opt/mattermost/config" \
     \
@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     \
  && export GOPATH=/opt/go \
  && MATTERMOST_BUILD_PATH=${GOPATH}/src/github.com/mattermost \
- && apk --no-cache add --virtual .builddeps curl g++ go git mercurial make nodejs \
+ && apk --no-cache add --virtual .builddeps curl g++ go git mercurial make nodejs-current-npm \
  && go get github.com/tools/godep \
  && npm update npm --global \
  && mkdir -p ${GOPATH} \

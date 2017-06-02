@@ -4,6 +4,11 @@ This file only reflects the changes that are made in this image. Please refer to
 the Mattermost [CHANGELOG](http://docs.mattermost.com/administration/changelog.html)
 for the list of changes in Mattermost.
 
+## 3.9.0
+
+- mattermost 3.9.0
+- on top of Alpine 3.6
+
 ## 3.8.0
 
 - mattermost 3.8.0

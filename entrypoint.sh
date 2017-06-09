@@ -4,10 +4,10 @@ set -e
 if [[ $DEBUG == true ]]; then
   set -x
   export MM_LOGSETTINGS_CONSOLE_LEVEL=DEBUG
-  echo "======================"
-  echo "Environment variables:"
+  echo "=============================="
+  echo "Initial environment variables:"
   env
-  echo "======================"
+  echo "=============================="
 fi
 
 #### Helper functions
@@ -26,31 +26,43 @@ vercmp() {
 
 configure_database() {
   echo "Configuring database..."
-  finalize_database_parameters
+  if [ -z "$MM_SQLSETTINGS_DATASOURCE" ]; then
+    finalize_database_parameters
+  else
+    echo "WARNING: If the database doesn't exist yet, its creation will fail."
+  fi
   check_database_connection
   create_missing_database
 }
 
 finalize_database_parameters() {
   # is a mysql or postgresql named host available?
-  echo -n "Trying to locate a database container."
-  for ((i=0;i<10;i++)); do
-    if ping -c1 -W1 mysql &> /dev/null; then
-      MM_SQLSETTINGS_DRIVERNAME=${MM_SQLSETTINGS_DRIVERNAME:-mysql}
-      DB_HOST=${DB_HOST:-mysql}
-      echo -e "\u2714"
-      break
-    elif ping -c1 -W1 postgres &> /dev/null; then
-      MM_SQLSETTINGS_DRIVERNAME=${MM_SQLSETTINGS_DRIVERNAME:-postgres}
-      DB_HOST=${DB_HOST:-postgres}
-      echo -e "\u2714"
-      break
-    fi
-    echo -n "."
-    sleep 1
-  done
+  if [ -z "$MM_SQLSETTINGS_DRIVERNAME" ] || [ -z "$DB_HOST" ]; then
+    echo -n "Trying to locate a database container."
+    for ((i=0;i<10;i++)); do
+      if ping -c1 -W1 mysql &> /dev/null; then
+        MM_SQLSETTINGS_DRIVERNAME=mysql
+        DB_HOST=mysql
+        echo -e "\u2714"
+        break
+      elif ping -c1 -W1 postgres &> /dev/null; then
+        MM_SQLSETTINGS_DRIVERNAME=postgres
+        DB_HOST=postgres
+        echo -e "\u2714"
+        break
+      fi
+      echo -n "."
+      sleep 1
+    done
+  fi
 
-  # db agnostic defaults
+  if [ -z "$DB_HOST" ]; then
+    echo "Neither was DB_HOST provided, nor could a database container be detected."
+    echo "Aborting."
+    exit 1
+  fi
+
+  # db-system agnostic defaults
   DB_NAME=${DB_NAME:-mattermost}
 
   # assemble datasource url
@@ -113,18 +125,25 @@ check_database_connection() {
 }
 
 create_missing_database() {
-  echo -n "Testing whether database ${DB_NAME} exists. "
+  # FIXME in case MM_SQLSETTINGS_DATASOURCE was fully provided, the needed variables must be extracted first
 
+  echo -n "Testing whether database ${DB_NAME} exists. "
   case ${MM_SQLSETTINGS_DRIVERNAME} in
     mysql)
-      echo -n "Creating database ${DB_NAME} if necessary. "
-      mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASS} mysql << EOF
-        CREATE DATABASE IF NOT EXISTS ${DB_NAME};
-        GRANT ALL PRIVILEGES ON ${DB_NAME} TO ${DB_USER};
+      if echo "SHOW DATABASES LIKE '${DB_NAME}';" | mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASS} | grep ${DB_NAME}; then
+        echo -e "\u2714"
+      else
+        echo -e "\u2718"
+        echo -n "Creating database ${DB_NAME}. "
+        mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASS} << EOF
+          CREATE DATABASE ${DB_NAME};
+          GRANT ALL PRIVILEGES ON ${DB_NAME} TO ${DB_USER};
 EOF
-      echo -e "\u2714"
+        echo -e "\u2714"
+      fi
       ;;
     postgres)
+
       if psql ${MM_SQLSETTINGS_DATASOURCE}; then
         echo -e "\u2714"
       else

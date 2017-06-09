@@ -103,6 +103,7 @@ variables:
 - `DB_ENCODING` (default: none / `utf8mb4,utf8`)
 - `DB_HOST`
 - `DB_NAME` (default: `mattermost`)
+  - must not contain `-`
 - `DB_PARAMS` (default: `sslmode=disable&connect_timeout=10` / `charset=${DB_ENCODING}`)
 - `DB_PASS`
 - `DB_PORT` (default: `5432` / `3306`)

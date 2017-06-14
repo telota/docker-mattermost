@@ -3,7 +3,7 @@ set -e
 
 if [[ $DEBUG == true ]]; then
   set -x
-  export MM_LOGSETTINGS_CONSOLE_LEVEL=DEBUG
+  export MM_LOGSETTINGS_CONSOLELEVEL=DEBUG
   echo "=============================="
   echo "Initial environment variables:"
   env
@@ -130,7 +130,7 @@ create_missing_database() {
   echo -n "Testing whether database ${DB_NAME} exists. "
   case ${MM_SQLSETTINGS_DRIVERNAME} in
     mysql)
-      if echo "SHOW DATABASES LIKE '${DB_NAME}';" | mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASS} | grep ${DB_NAME}; then
+      if echo "SHOW DATABASES LIKE '${DB_NAME}';" | mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} -p${DB_PASS} | grep ${DB_NAME} &> /dev/null ; then
         echo -e "\u2714"
       else
         echo -e "\u2718"

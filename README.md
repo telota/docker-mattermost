@@ -110,6 +110,14 @@ variables:
 - `DB_USER` (default: `postgres` / `root`)
 
 
+# Using the cli tools
+
+You can use the [cli tools](https://docs.mattermost.com/administration/command-line-tools.html),
+e.g. to invite a user:
+
+    docker exec -t <container_name_or_id> platform user invite johndoe@internationale.org central_committee
+
+
 # Building the image
 
 The source repository contains a `Makefile` that can be used to build the image

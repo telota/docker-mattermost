@@ -1,6 +1,6 @@
 FROM alpine:3.6
 
-ENV MATTERMOST_VERSION=3.9.0 \
+ENV MATTERMOST_VERSION=3.10.0 \
     MATTERMOST_DATA_DIR="/opt/mattermost/data" \
     MATTERMOST_CONF_DIR="/opt/mattermost/config" \
     \
